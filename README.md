@@ -9,7 +9,13 @@ chrome/   Chrome extension (coming soon)
 
 ## Safari
 
-A small macOS app checks GitHub in the background and posts a notification for each new item. It also has an optional menu bar icon. The Safari extension badges the count; its popup has Issues, PRs and Activity tabs, plus a full dashboard. Your token stays in the Keychain, and the extension never touches the network.
+- 🔔 **Native macOS notifications** for each new item; click one to open it on GitHub
+- 🔢 **Toolbar badge** with the count of everything waiting on you
+- 🗂️ **Popup** with Issues, PRs and Activity tabs, showing the most recent items
+- 📋 **Dashboard** listing everything, grouped by why it needs you
+- 🔄 **Background checks** every 1–60 minutes, or on demand with Check now
+- 📍 **Optional menu bar icon** with the count and a quick list
+- 🔒 **Private by design:** your token stays in the Keychain, and the extension never touches the network
 
 **Install** (macOS 14+, Xcode 16+):
 
@@ -28,4 +34,8 @@ Without a Team ID the app is signed ad-hoc and Safari needs **Develop > Allow Un
 
 ## Chrome
 
-Coming soon.
+Coming soon. Planned:
+
+- 🔢 **Toolbar badge** with the count of everything waiting on you
+- 🗂️ **Popup** with the same Issues, PRs and Activity tabs
+- 📋 **Dashboard** listing everything, grouped by why it needs you
