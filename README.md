@@ -1,24 +1,17 @@
 # GitIt
 
-Everything on GitHub that's waiting on you: macOS notifications plus a browser extension.
-
-- **macOS app** runs in the background, checks GitHub on an interval, and posts a notification for each new item.
-- **Safari extension** badges the count; the popup has Issues, PRs and Activity tabs, plus a full dashboard.
-- Covers your open PRs, review requests, assigned issues/PRs and unread notifications.
-- Your token stays in the Keychain. The extension never touches the network.
-
-> **Chrome extension coming soon.**
-
-## Layout
+Everything on GitHub that's waiting on you (your open PRs, review requests, assigned issues/PRs and unread notifications) in your browser toolbar.
 
 ```
 safari/   macOS app + Safari extension (Xcode project)
-chrome/   Chrome extension (not started)
+chrome/   Chrome extension (coming soon)
 ```
 
-## Install (Safari)
+## Safari
 
-Requires macOS 14+ and Xcode 16+.
+A small macOS app checks GitHub in the background and posts a notification for each new item. It also has an optional menu bar icon. The Safari extension badges the count; its popup has Issues, PRs and Activity tabs, plus a full dashboard. Your token stays in the Keychain, and the extension never touches the network.
+
+**Install** (macOS 14+, Xcode 16+):
 
 ```sh
 cp safari/Config/Local.example.xcconfig safari/Config/Local.xcconfig   # optional: add your Team ID
@@ -27,8 +20,12 @@ make install                                                            # builds
 
 Without a Team ID the app is signed ad-hoc and Safari needs **Develop > Allow Unsigned Extensions**.
 
-## Setup
+**Setup:**
 
 1. Create a [classic token](https://github.com/settings/tokens/new?scopes=notifications,repo,read:org&description=GitIt) with `notifications`, `repo`, `read:org`.
 2. Paste it into GitIt's settings and press Save.
 3. Turn GitIt on in **Safari > Settings > Extensions**.
+
+## Chrome
+
+Coming soon.

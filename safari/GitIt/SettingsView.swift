@@ -5,6 +5,7 @@ import SwiftUI
 struct SettingsView: View {
     @State private var settings = AppSettings.shared
     @State private var monitor = Monitor.shared
+    @Environment(\.openWindow) private var openWindow
 
     @State private var tokenDraft = ""
     @State private var tokenStatus: TokenStatus = .none
@@ -34,7 +35,8 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Section("General") {
+            Section {
+                Toggle("Show menu bar icon", isOn: $settings.showMenuBarIcon)
                 Toggle("Mute notifications", isOn: $settings.muteNotifications)
                 Toggle("Show system notifications", isOn: $settings.showSystemNotifications)
                     .onChange(of: settings.showSystemNotifications) { _, on in
@@ -58,6 +60,16 @@ struct SettingsView: View {
                 Toggle("Launch at login", isOn: $settings.launchAtLogin)
                 if let error = settings.launchAtLoginError {
                     Text(error).font(.callout).foregroundStyle(.red)
+                }
+            } header: {
+                Text("General")
+            } footer: {
+                if !settings.showMenuBarIcon {
+                    HStack(alignment: .firstTextBaseline) {
+                        Text("GitIt keeps running without a menu bar icon. Open it from Applications or Spotlight to get back here.")
+                        Spacer()
+                        Button("Quit GitIt") { NSApp.terminate(nil) }
+                    }
                 }
             }
 
@@ -115,6 +127,7 @@ struct SettingsView: View {
             Task { await refreshExtensionState() }
         }
         .onAppear {
+            AppDelegate.openSettings = { openWindow(id: "main") }
             if let login = monitor.login, monitor.hasToken { tokenStatus = .saved(login: login) }
         }
     }

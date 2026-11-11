@@ -18,11 +18,18 @@ final class AppSettings {
         static let system = "showSystemNotifications"
         static let interval = "checkIntervalMinutes"
         static let popupCount = "popupItemCount"
+        static let menuBar = "showMenuBarIcon"
     }
 
     /// How many items each tab of the Safari popup lists.
     var popupItemCount: Int {
         didSet { defaults.set(popupItemCount, forKey: Key.popupCount) }
+    }
+
+    /// Whether GitIt has an item in the menu bar. Off, the app runs with no visible UI;
+    /// opening it again from Finder or Spotlight brings the settings window back.
+    var showMenuBarIcon: Bool {
+        didSet { defaults.set(showMenuBarIcon, forKey: Key.menuBar) }
     }
 
     var muteNotifications: Bool {
@@ -63,7 +70,9 @@ final class AppSettings {
             Key.system: true,
             Key.interval: 1,
             Key.popupCount: 5,
+            Key.menuBar: true,
         ])
+        showMenuBarIcon = defaults.bool(forKey: Key.menuBar)
         muteNotifications = defaults.bool(forKey: Key.mute)
         showSystemNotifications = defaults.bool(forKey: Key.system)
         let stored = defaults.integer(forKey: Key.interval)

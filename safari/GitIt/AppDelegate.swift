@@ -1,6 +1,10 @@
 import AppKit
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    /// Opens the settings window. SwiftUI owns openWindow, so the views hand it over here;
+    /// reopening needs it when the window is gone and there is no menu bar item to use.
+    static var openSettings: (() -> Void)?
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         Notifier.shared.prepare()
         Monitor.shared.start()
@@ -22,8 +26,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// Reopened from the Dock or Finder while running: bring the window back.
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        if !flag, let window = NSApp.windows.first(where: { $0.canBecomeKey }) {
-            window.makeKeyAndOrderFront(nil)
+        if !flag {
+            if let window = NSApp.windows.first(where: { $0.canBecomeKey }) {
+                window.makeKeyAndOrderFront(nil)
+            } else {
+                Self.openSettings?()
+            }
         }
         NSApp.activate(ignoringOtherApps: true)
         return true
