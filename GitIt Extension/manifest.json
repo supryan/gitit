@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "GitIt",
+    "description": "A badge with everything on GitHub that is waiting on you, and a dashboard listing it.",
+    "version": "1.0",
+
+    "icons": {
+        "48": "icon-48.png",
+        "96": "icon-96.png",
+        "128": "icon-128.png",
+        "256": "icon-256.png",
+        "512": "icon-512.png"
+    },
+
+    "background": {
+        "scripts": [ "background.js" ],
+        "type": "module"
+    },
+
+    "action": {
+        "default_icon": "toolbar-icon.svg",
+        "default_title": "GitIt",
+        "default_popup": "popup.html"
+    },
+
+    "permissions": [ "nativeMessaging", "alarms", "storage", "tabs" ]
+}

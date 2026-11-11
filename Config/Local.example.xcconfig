@@ -1,0 +1,8 @@
+// Copy to Local.xcconfig (gitignored) to sign with your Apple ID team. Safari accepts a
+// development-signed extension without the "Allow Unsigned Extensions" switch, and the
+// app group gets the team prefix macOS prefers.
+// Team ID: Xcode > Settings > Accounts > your team (a free Personal Team works), or
+// developer.apple.com/account.
+DEVELOPMENT_TEAM = ABCDE12345
+CODE_SIGN_STYLE = Automatic
+CODE_SIGN_IDENTITY = Apple Development
