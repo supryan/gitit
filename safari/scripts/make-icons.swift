@@ -1,5 +1,5 @@
 // Draws the app icon and the extension icons: a dark rounded square, a white inbox tray
-// and a red dot. Run from the repo root: swift scripts/make-icons.swift
+// and a red dot. Run from safari/: swift scripts/make-icons.swift (or make icons)
 import AppKit
 
 let root = URL(fileURLWithPath: CommandLine.arguments.count > 1 ? CommandLine.arguments[1] : FileManager.default.currentDirectoryPath)
