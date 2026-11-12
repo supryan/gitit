@@ -20,15 +20,19 @@ GitIt is a small macOS app that does the work: it checks GitHub in the backgroun
 
 ## Browser extensions
 
-### Safari
+### Features
 
 - 🔢 **Toolbar badge** with the count of everything waiting on you
 - 🗂️ **Popup** with Issues, PRs and Activity tabs, showing the most recent items
-- 📋 **Dashboard** listing everything, grouped by why it needs you
+- 📋 **Dashboard** listing everything, grouped by why it needs you, with organization and project filters
 
-### Chrome
+**Safari**
 
-The same badge, popup and dashboard, fed by the same Mac app. Install it from GitIt's settings: **Browser Extensions > Chrome > Install…**, then load it in Chrome as the app shows you. More in [`chrome/README.md`](chrome/README.md).
+In GitIt's settings, under **Browser Extensions**, press **Enable** next to Safari and turn GitIt on.
+
+**Chrome**
+
+In GitIt's settings, under **Browser Extensions**, press **Install** next to Chrome. Then in `chrome://extensions`, turn on **Developer mode** and drag in the **GitIt for Chrome** folder the app shows you. More in [`chrome/README.md`](chrome/README.md).
 
 ## Install
 
@@ -41,8 +45,8 @@ make install                                                            # builds
 
 Without a Team ID the app is signed ad-hoc and Safari needs **Develop > Allow Unsigned Extensions**. More in [`app/README.md`](app/README.md).
 
-**Setup:**
+**Setup**
 
 1. Create a [classic token](https://github.com/settings/tokens/new?scopes=notifications,repo,read:org&description=GitIt) with `notifications`, `repo`, `read:org`.
 2. Paste it into GitIt's settings and press Save.
-3. Under **Browser Extensions**, press **Enable…** next to Safari and turn GitIt on, and **Install…** next to Chrome if you use it.
+3. Turn on the [browser extensions](#browser-extensions) you use.
