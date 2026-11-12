@@ -1,4 +1,4 @@
-# <img src="safari/GitIt/Assets.xcassets/AppIcon.appiconset/icon-256.png" alt="" width="44" align="center"> GitIt
+# <img src="safari/GitIt/Assets.xcassets/AppIcon.appiconset/icon-256.png" alt="" width="44" align="absmiddle"> GitIt
 
 Everything on GitHub that's waiting on you (your open PRs, review requests, assigned issues/PRs and unread notifications) in your menu bar, your notifications and your browser toolbar.
 
