@@ -111,16 +111,22 @@ final class StatusItemController: NSObject, NSMenuDelegate {
             } else {
                 addItems(of: summary, to: menu)
             }
-            menu.addItem(.separator())
-            menu.addItem(note(lastChecked(summary.checkedAt), symbol: "clock"))
-        } else {
-            menu.addItem(note(monitor.isChecking ? "Checking…" : "Not checked yet.", symbol: "clock"))
         }
 
+        // When it last checked, then the two things to do about it; same icons as the
+        // Check and Dashboard buttons in Settings.
         menu.addItem(.separator())
+        if let summary = monitor.summary, monitor.hasToken {
+            menu.addItem(note(monitor.isChecking ? "Checking…" : lastChecked(summary.checkedAt), symbol: "clock"))
+        } else if monitor.hasToken {
+            menu.addItem(note(monitor.isChecking ? "Checking…" : "Not checked yet.", symbol: "clock"))
+        }
         let check = action("Check Now", symbol: "arrow.clockwise", key: "r") { Task { await Monitor.shared.refresh() } }
         check.isEnabled = monitor.hasToken && !monitor.isChecking
         menu.addItem(check)
+        menu.addItem(action("Dashboard", symbol: "list.bullet.rectangle", key: "d") { Monitor.shared.openDashboard() })
+
+        menu.addItem(.separator())
         menu.addItem(action("Pull Requests on GitHub", symbol: "arrow.triangle.pull") { NSWorkspace.shared.open(Links.pullRequests) })
         menu.addItem(action("Issues on GitHub", symbol: "smallcircle.filled.circle") { NSWorkspace.shared.open(Links.issues) })
         menu.addItem(action("Notifications on GitHub", symbol: "bell") { NSWorkspace.shared.open(Links.notifications) })
