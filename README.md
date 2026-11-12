@@ -23,16 +23,14 @@ GitIt is a small macOS app that does the work: it checks GitHub in the backgroun
 
 ### Install
 
-<p align="center">
-  <a href="https://github.com/supryan/gitit/releases/latest/download/GitIt.zip"><img src="https://img.shields.io/badge/Download_GitIt-macOS_14%2B-111827?style=for-the-badge&logo=apple&logoColor=white" alt="Download GitIt for macOS" height="44"></a>
-</p>
-
-> [!TIP]
-> Unzip it, move **GitIt** to Applications and open it. It's signed and notarized by Apple, so it opens without any warnings.
+<a href="https://github.com/supryan/gitit/releases/latest/download/GitIt.zip"><img src="https://img.shields.io/badge/Download_GitIt-macOS_14%2B-111827?style=for-the-badge&logo=apple&logoColor=white" alt="Download GitIt for macOS" height="44"></a>
 
 1. Create a [classic token](https://github.com/settings/tokens/new?scopes=notifications,repo,read:org&description=GitIt) with `notifications`, `repo`, `read:org`.
 2. Paste it into GitIt's settings and press Save.
 3. Turn on the [browser extensions](#browser-extensions) you use.
+
+> [!TIP]
+> Unzip it, move GitIt to Applications and open it. It's signed and notarized.
 
 ## Browser extensions
 
