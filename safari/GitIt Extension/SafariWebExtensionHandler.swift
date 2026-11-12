@@ -9,6 +9,9 @@ import os.log
 ///   { type: "status" }  -> { available, hasToken, summary }
 ///   { type: "refresh" } -> asks the app (if running) to check now, then answers as "status"
 ///
+/// The answer carries `openDashboard: true` once after the app's Dashboard button was
+/// pressed: Safari will not open the page for the app, so the extension opens it.
+///
 /// Both may carry `dashboard`, the dashboard page's URL. Safari picks the extension's URL
 /// at install, so the app cannot know it; it is kept in the app group for Settings' button.
 final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
@@ -55,6 +58,11 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             payload["summary"] = summary
         } else {
             payload["summary"] = NSNull()
+        }
+        // A Dashboard request from the app: hand it over once, if it is recent.
+        if let requested = shared.object(forKey: "dashboardRequestedAt") as? Double {
+            shared.removeObject(forKey: "dashboardRequestedAt")
+            if Date().timeIntervalSince1970 - requested < 90 { payload["openDashboard"] = true }
         }
         return payload
     }

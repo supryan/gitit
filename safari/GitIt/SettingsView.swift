@@ -107,9 +107,10 @@ struct SettingsView: View {
                         Label("Dashboard", systemImage: "list.bullet.rectangle")
                     }
                     .glassButton()
-                    .help(monitor.dashboardURL == nil
-                          ? "Opens Safari. The dashboard opens from here once the Safari extension has run."
-                          : "Open the dashboard in Safari")
+                    .disabled(!monitor.isDashboardReady)
+                    .help(monitor.isDashboardReady
+                          ? "Open the dashboard in Safari"
+                          : "Available once the Safari extension is on and has run.")
                 }
             }
 

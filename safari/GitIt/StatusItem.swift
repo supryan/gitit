@@ -124,7 +124,15 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         let check = action("Check Now", symbol: "arrow.clockwise", key: "r") { Task { await Monitor.shared.refresh() } }
         check.isEnabled = monitor.hasToken && !monitor.isChecking
         menu.addItem(check)
-        menu.addItem(action("Dashboard", symbol: "list.bullet.rectangle", key: "d") { Monitor.shared.openDashboard() })
+        let dashboard = action("Dashboard", symbol: "list.bullet.rectangle", key: "d") { Monitor.shared.openDashboard() }
+        dashboard.isEnabled = monitor.isDashboardReady
+        if !monitor.isDashboardReady {
+            dashboard.toolTip = "Available once the Safari extension is on and has run."
+        }
+        menu.addItem(dashboard)
+        // The extension may have been turned on or off since; this menu shows the last
+        // known state, and the next one the fresh one.
+        Task { await monitor.refreshDashboardReadiness() }
 
         menu.addItem(.separator())
         menu.addItem(action("Pull Requests on GitHub", symbol: "arrow.triangle.pull") { NSWorkspace.shared.open(Links.pullRequests) })

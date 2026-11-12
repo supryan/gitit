@@ -17,6 +17,7 @@ async function refresh() {
         status = { available: false, hasToken: false, summary: null, error: String(error) };
     }
     await updateBadge();
+    takeDashboardRequest();
     return status;
 }
 
@@ -27,7 +28,16 @@ async function requestCheckNow() {
         console.error("GitIt: native message failed", error);
     }
     await updateBadge();
+    takeDashboardRequest();
     return status;
+}
+
+// The app's Dashboard button: Safari will not open this page for the app, so the app
+// leaves a request that arrives with the next status answer, and this opens it.
+function takeDashboardRequest() {
+    if (!status?.openDashboard) return;
+    status.openDashboard = false;
+    openDashboard();
 }
 
 function isStale(summary) {
@@ -89,6 +99,12 @@ browser.runtime.onMessage.addListener((message) => {
         default:
             return undefined;
     }
+});
+
+// The app brings Safari forward after leaving a Dashboard request; a window gaining
+// focus wakes this script, and the status answer carries the request.
+browser.windows.onFocusChanged.addListener((windowId) => {
+    if (windowId !== browser.windows.WINDOW_ID_NONE) refresh();
 });
 
 browser.alarms.onAlarm.addListener((alarm) => {

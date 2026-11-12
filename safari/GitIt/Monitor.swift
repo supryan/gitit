@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Observation
+import SafariServices
 
 /// Polls GitHub on the chosen interval, notifies about new items, and hands the summary
 /// to the Safari extension through the app group.
@@ -22,6 +23,7 @@ final class Monitor {
     private let notifier = Notifier.shared
     private var loop: Task<Void, Never>?
     private var observer: NSObjectProtocol?
+    private var activation: NSObjectProtocol?
 
     private let defaults = UserDefaults.standard
     private let seenKey = "seenItemIds"
@@ -39,14 +41,39 @@ final class Monitor {
         shared?.string(forKey: "dashboardURL").flatMap(URL.init(string:))
     }
 
-    /// Opens the dashboard in Safari; without its address yet, just brings Safari forward.
+    /// Whether the dashboard can be opened: its address is known and the extension is on.
+    /// Settings' button and the menu item are greyed out until then.
+    private(set) var isDashboardReady = false
+
+    private let extensionId = (Bundle.main.bundleIdentifier ?? "com.jickfive.gitit") + ".Extension"
+
+    /// Re-reads both halves of `isDashboardReady`. Runs after each check and whenever
+    /// GitIt comes forward (the user may have just turned the extension on or off).
+    func refreshDashboardReadiness() async {
+        guard dashboardURL != nil else {
+            isDashboardReady = false
+            return
+        }
+        let enabled = (try? await SFSafariExtensionManager.stateOfSafariExtension(withIdentifier: extensionId))?.isEnabled ?? false
+        isDashboardReady = enabled
+    }
+
+    /// Opens the dashboard in Safari, when it is ready.
+    ///
+    /// Safari will not open an extension's page for another app, so the extension opens
+    /// it: this leaves a request in the app group and brings Safari forward. Safari's
+    /// window gaining focus wakes the extension, which asks for the status, finds the
+    /// request in the answer, and opens the dashboard tab itself.
     func openDashboard() {
-        guard let safari = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.Safari") else { return }
-        let configuration = NSWorkspace.OpenConfiguration()
-        configuration.activates = true
-        if let url = dashboardURL {
-            NSWorkspace.shared.open([url], withApplicationAt: safari, configuration: configuration)
-        } else {
+        guard isDashboardReady,
+              let safari = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.Safari") else { return }
+        shared?.set(Date().timeIntervalSince1970, forKey: "dashboardRequestedAt")
+        // Take focus first, so Safari's window gains it even if Safari was already in front
+        // (the menu bar item does not activate GitIt on its own).
+        NSApp.activate(ignoringOtherApps: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            let configuration = NSWorkspace.OpenConfiguration()
+            configuration.activates = true
             NSWorkspace.shared.openApplication(at: safari, configuration: configuration)
         }
     }
@@ -56,6 +83,11 @@ final class Monitor {
             forName: Self.refreshRequest, object: nil, queue: .main
         ) { [weak self] _ in
             Task { @MainActor in await self?.refresh() }
+        }
+        activation = NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in await self?.refreshDashboardReadiness() }
         }
         restartLoop()
     }
@@ -109,6 +141,7 @@ final class Monitor {
         self.summary = summary
         publish(summary)
         notifyAboutNew(in: summary.items, checkedAt: summary.checkedAt)
+        await refreshDashboardReadiness()
     }
 
     /// Re-publishes the last result with the current settings, without another check.
