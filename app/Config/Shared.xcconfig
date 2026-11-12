@@ -3,8 +3,8 @@ MACOSX_DEPLOYMENT_TARGET = 14.0
 SWIFT_VERSION = 5.0
 SWIFT_STRICT_CONCURRENCY = minimal
 // Keep equal to "version" in safari/manifest.json and chrome/manifest.json: Safari compares the two.
-MARKETING_VERSION = 1.0
-CURRENT_PROJECT_VERSION = 1
+MARKETING_VERSION = 1.1
+CURRENT_PROJECT_VERSION = 2
 
 // Identifiers. The extension's id is the app's id + ".Extension".
 GITIT_BUNDLE_ID = com.gitit.app

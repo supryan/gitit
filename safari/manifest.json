@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "GitIt",
     "description": "A badge with everything on GitHub that is waiting on you, and a dashboard listing it.",
-    "version": "1.0",
+    "version": "1.1",
     "author": "Ryan Gordon",
 
     "icons": {
