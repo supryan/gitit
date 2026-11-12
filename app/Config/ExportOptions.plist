@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+	How `make release` exports GitIt for download outside the App Store: signed with a
+	Developer ID by Ryan Gordon's paid team (Xcode manages the certificate), then uploaded
+	to Apple's notary service. The Safari extension inside is signed the same way, so Safari
+	runs it without Develop > Allow Unsigned Extensions.
+-->
+<plist version="1.0">
+<dict>
+	<key>method</key>
+	<string>developer-id</string>
+	<key>destination</key>
+	<string>upload</string>
+	<key>signingStyle</key>
+	<string>automatic</string>
+	<key>teamID</key>
+	<string>T9MFQS37T8</string>
+</dict>
+</plist>

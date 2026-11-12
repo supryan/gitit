@@ -5,7 +5,7 @@ GitIt Mac app: the token stays in the app, and the extension never touches the n
 
 ## Install
 
-In GitIt's settings, under **Browser Extensions**, press **Install…** next to Chrome. GitIt
+In GitIt's settings, under **Browser Extensions**, press **Install** next to Chrome. GitIt
 puts the extension in `~/Library/Application Support/GitIt/GitIt for Chrome`, registers its
 native host with Chrome, and walks you through the one step Chrome keeps for you: turn on
 Developer mode in `chrome://extensions` and drag that folder onto the page (or press
@@ -33,3 +33,11 @@ run it again and press the reload arrow on GitIt's card in `chrome://extensions`
 The popup and dashboard are shared with Safari, so change them in `shared/`. The native host
 is GitIt's own executable: Chrome launches it with the extension's origin as its argument,
 and it answers from the running app's latest result (`app/GitIt/ChromeNativeHost.swift`).
+
+## The extension id
+
+The `key` in `manifest.json` (a public key, safe to publish) pins the id to
+`mgcnmhlmcnjpabbdcpoflcejlojpmoap` wherever the extension is loaded, and GitIt's native host
+only answers that id. The matching private key is only needed to keep this id on a first
+Chrome Web Store upload; it is not in the repo (`*.pem` is ignored).
+
