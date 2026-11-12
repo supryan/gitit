@@ -3,6 +3,7 @@
 
 :root {
     --page: #f6f8fa;
+    --heading-bg: #f9fafb;
     --faint: #8c959f;
     --active: #eaeef2;
     --warn-bg: #fff8e6;
@@ -13,6 +14,7 @@
 @media (prefers-color-scheme: dark) {
     :root {
         --page: #15181d;
+        --heading-bg: #20242a;
         --faint: #6e7681;
         --active: #2d333b;
         --warn-bg: #2a2111;
@@ -185,8 +187,10 @@ h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; line
 
 .group-title {
     margin: 0;
-    padding-top: 12px;
-    padding-bottom: 6px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background: var(--heading-bg);
+    border-bottom: 1px solid var(--border);
     color: var(--muted);
     font-size: 12px;
     font-weight: 700;
@@ -194,7 +198,7 @@ h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; line
     text-transform: uppercase;
 }
 
-.group-title:not(:first-child) { margin-top: 4px; border-top: 1px solid var(--border); padding-top: 16px; }
+.group-title:not(:first-child) { border-top: 1px solid var(--border); }
 .group-title .count { margin-left: 6px; letter-spacing: 0; }
 
 .item {
