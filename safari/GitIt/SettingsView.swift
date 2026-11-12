@@ -211,13 +211,13 @@ struct SettingsView: View {
 
     private var generalSection: some View {
         Section {
-            Toggle("Show menu bar icon", isOn: $settings.showMenuBarIcon)
-            if settings.showMenuBarIcon {
-                MenuBarStylePicker(selection: $settings.menuBarIconStyle)
-            }
             Toggle("Launch at login", isOn: $settings.launchAtLogin)
             if let error = settings.launchAtLoginError {
                 Text(error).font(.callout).foregroundStyle(.red)
+            }
+            Toggle("Show menu bar icon", isOn: $settings.showMenuBarIcon)
+            if settings.showMenuBarIcon {
+                MenuBarStylePicker(selection: $settings.menuBarIconStyle)
             }
         } header: {
             Text("General")
@@ -253,7 +253,7 @@ struct SettingsView: View {
             }
             .onChange(of: settings.popupItemCount) { _, _ in monitor.settingsChanged() }
         } header: {
-            Text("Browsers")
+            Text("Browser Extensions")
         } footer: {
             Text("The extension shows the count on a toolbar button; its popup lists the most recent items. Chrome support is on the way.")
         }
