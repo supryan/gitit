@@ -58,7 +58,8 @@ Run from the repo root or from `app/`.
 | `make chrome` | Build the Chrome extension to load unpacked (repo root only; see [`chrome/`](../chrome/README.md)) |
 | `make icons` | Redraw the app and extension icons from `scripts/make-icons.swift` |
 | `make release` | Build a signed, notarized `GitIt.zip` for download |
-| `make publish` | Copy that zip to the site that hosts the download |
+| `make github-release` | Publish that zip as a GitHub release `v<version>` (needs `gh`) |
+| `make publish` | Copy that zip to the site that also hosts the download |
 | `make clean` | Remove `app/build` |
 
 ## Releasing
@@ -69,8 +70,10 @@ zips the result to `app/build/release.noindex/GitIt.zip`. It needs a paid Apple 
 team; pass yours with `make release RELEASE_TEAM=<team id>`. Signed this way, GitIt opens
 without warnings and Safari runs its extension as is.
 
-`make publish` copies the zip into `../supryan-v2/public/downloads` (`SITE=<path>` to change
-where); deploy that site to put it online.
+`make github-release` then tags `v<version>` (from `MARKETING_VERSION`) and attaches the zip;
+the README's download button and version badge always point at the latest release.
+`make publish` also copies the zip into `../supryan-v2/public/downloads` (`SITE=<path>` to
+change where); deploy that site to put it online there.
 
 Bump `MARKETING_VERSION` in `Config/Shared.xcconfig` and `version` in both extension
 manifests together; Safari compares them.

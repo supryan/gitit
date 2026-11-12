@@ -15,7 +15,7 @@ APP       := $(BUILD_DIR)/Build/Products/$(CONFIG)/GitIt.app
 DEST      := $(HOME)/Applications/GitIt.app
 LSREGISTER := /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
 
-.PHONY: build install icons clean open release publish
+.PHONY: build install icons clean open release publish github-release
 
 # Releases for download: signed with a Developer ID by the paid team and notarized, so
 # GitIt opens on anyone's Mac without warnings and Safari runs its extension as is.
@@ -25,6 +25,7 @@ ARCHIVE      := $(RELEASE_DIR)/GitIt.xcarchive
 RELEASE_ZIP  := $(RELEASE_DIR)/GitIt.zip
 # Where `make publish` puts the zip: the portfolio site, which serves public/ from its root.
 SITE         := ../../supryan-v2
+VERSION      := $(shell sed -n 's/^MARKETING_VERSION = //p' Config/Shared.xcconfig)
 
 # -allowProvisioningUpdates lets Xcode create/renew the development certificate and
 # profiles for the team in Local.xcconfig (free Personal Team profiles expire after 7 days).
@@ -70,6 +71,12 @@ release:
 	ditto -c -k --keepParent "$(RELEASE_DIR)/notarized/GitIt.app" "$(RELEASE_ZIP)"
 	@$(LSREGISTER) -u "$(RELEASE_DIR)/notarized/GitIt.app" 2>/dev/null || true
 	@echo "Release: $(RELEASE_ZIP)"
+
+# Tags v$(VERSION) on GitHub and attaches the zip; the README's download button always
+# serves the latest release's GitIt.zip.
+github-release:
+	@test -f "$(RELEASE_ZIP)" || { echo "No release yet; run make release first." >&2; exit 1; }
+	gh release create "v$(VERSION)" "$(RELEASE_ZIP)" --title "GitIt $(VERSION)" --generate-notes
 
 # Copies the release into the site; commit and deploy the site to put it online.
 publish:

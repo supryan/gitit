@@ -1,5 +1,8 @@
 # <img src="app/GitIt/Assets.xcassets/AppIcon.appiconset/icon-256.png" alt="" width="44" align="absmiddle"> GitIt
 
+[![Stable release](https://img.shields.io/github/v/release/supryan/gitit?label=stable&color=16a34a)](https://github.com/supryan/gitit/releases/latest)
+[![License: MIT](https://img.shields.io/github/license/supryan/gitit?color=2f7cf6)](LICENSE)
+
 Everything on GitHub that's waiting on you (your open PRs, review requests, assigned issues/PRs and unread notifications) in your menu bar, your notifications and your browser toolbar.
 
 <p align="center">
@@ -21,7 +24,7 @@ GitIt is a small macOS app that does the work: it checks GitHub in the backgroun
 ### Install
 
 <p align="center">
-  <a href="https://supryan.com/downloads/GitIt.zip"><img src="https://img.shields.io/badge/Download_GitIt-macOS_14%2B-111827?style=for-the-badge&logo=apple&logoColor=white" alt="Download GitIt for macOS" height="44"></a>
+  <a href="https://github.com/supryan/gitit/releases/latest/download/GitIt.zip"><img src="https://img.shields.io/badge/Download_GitIt-macOS_14%2B-111827?style=for-the-badge&logo=apple&logoColor=white" alt="Download GitIt for macOS" height="44"></a>
 </p>
 
 > [!TIP]
