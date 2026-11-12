@@ -54,4 +54,4 @@ GitIt is open source, and issues and pull requests are welcome. Building and the
 
 ## License
 
-[MIT](LICENSE) © Ryan Gordon
+[MIT](LICENSE) © [Ryan Gordon](https://supryan.com)
