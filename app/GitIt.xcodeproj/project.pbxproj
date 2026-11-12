@@ -49,6 +49,7 @@
 		1A0000000000000000000060 /* Exceptions for "GitIt" folder in "GitIt" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				.claude,
 				Info.plist,
 			);
 			target = 1A0000000000000000000010 /* GitIt */;
@@ -56,6 +57,7 @@
 		1A0000000000000000000061 /* Exceptions for "GitIt Extension" folder in "GitIt Extension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				.claude,
 				Info.plist,
 			);
 			target = 1A0000000000000000000020 /* GitIt Extension */;
@@ -63,6 +65,7 @@
 		1A0000000000000000000073 /* Exceptions for "shared" folder in "GitIt Extension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				.claude,
 				icons/icon-16.png,
 				icons/icon-32.png,
 				icons/icon-48.png,

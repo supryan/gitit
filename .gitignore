@@ -4,3 +4,6 @@ DerivedData/
 xcuserdata/
 *.xcuserstate
 app/Config/Local.xcconfig
+
+# Private keys (the Chrome extension's signing key lives at chrome/key.pem, never committed)
+*.pem
