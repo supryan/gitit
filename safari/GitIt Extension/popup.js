@@ -63,11 +63,8 @@ function row(item) {
     if (item.isDraft) title.appendChild(el("span", "draft", "Draft"));
     text.appendChild(title);
     const sub = el("div", "sub");
-    sub.appendChild(document.createTextNode(item.number ? `${item.repository} #${item.number}` : item.repository));
-    if (item.reason) {
-        sub.appendChild(document.createTextNode(" · "));
-        sub.appendChild(el("span", item.hasUnread ? "reason unread" : "reason", item.reason));
-    }
+    sub.appendChild(statusTag(item));
+    sub.appendChild(el("span", "where", whereText(item)));
     text.appendChild(sub);
     button.appendChild(text);
 

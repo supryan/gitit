@@ -8,6 +8,9 @@ import os.log
 /// Messages:
 ///   { type: "status" }  -> { available, hasToken, summary }
 ///   { type: "refresh" } -> asks the app (if running) to check now, then answers as "status"
+///
+/// Both may carry `dashboard`, the dashboard page's URL. Safari picks the extension's URL
+/// at install, so the app cannot know it; it is kept in the app group for Settings' button.
 final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
     private static let appGroup = Bundle.main.object(forInfoDictionaryKey: "GitItAppGroup") as? String
     private static let refreshRequest = Notification.Name("com.jickfive.gitit.refresh")
@@ -16,6 +19,10 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         let request = context.inputItems.first as? NSExtensionItem
         let message = request?.userInfo?[SFExtensionMessageKey] as? [String: Any]
         let type = message?["type"] as? String ?? "status"
+
+        if let dashboard = message?["dashboard"] as? String {
+            rememberDashboard(dashboard)
+        }
 
         if type == "refresh" {
             DistributedNotificationCenter.default().postNotificationName(
@@ -26,6 +33,12 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         let response = NSExtensionItem()
         response.userInfo = [SFExtensionMessageKey: status()]
         context.completeRequest(returningItems: [response], completionHandler: nil)
+    }
+
+    private func rememberDashboard(_ url: String) {
+        guard let group = Self.appGroup, let shared = UserDefaults(suiteName: group),
+              shared.string(forKey: "dashboardURL") != url else { return }
+        shared.set(url, forKey: "dashboardURL")
     }
 
     private func status() -> [String: Any] {

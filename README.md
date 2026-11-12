@@ -46,11 +46,3 @@ Without a Team ID the app is signed ad-hoc and Safari needs **Develop > Allow Un
 1. Create a [classic token](https://github.com/settings/tokens/new?scopes=notifications,repo,read:org&description=GitIt) with `notifications`, `repo`, `read:org`.
 2. Paste it into GitIt's settings and press Save.
 3. Under **Browser Extensions**, press **Enable…** next to Safari and turn GitIt on.
-
-## Layout
-
-```
-safari/   the Mac app + Safari extension (Xcode project)
-chrome/   Chrome extension (coming soon)
-docs/     README images
-```

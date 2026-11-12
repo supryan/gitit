@@ -185,12 +185,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
 
     private static func dot(for kind: AttentionItem.Kind) -> NSImage {
         if let image = dots[kind] { return image }
-        let color: NSColor = switch kind {
-        case .reviewRequest: .systemPurple
-        case .assigned: .systemGreen
-        case .pullRequest: .systemBlue
-        case .notification: .systemOrange
-        }
+        let color = kind.nsColor
         let image = NSImage(size: NSSize(width: 10, height: 10), flipped: false) { rect in
             color.setFill()
             NSBezierPath(ovalIn: rect.insetBy(dx: 1, dy: 1)).fill()

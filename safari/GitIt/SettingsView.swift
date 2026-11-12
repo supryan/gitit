@@ -82,21 +82,43 @@ struct SettingsView: View {
                 }
                 .lineLimit(1)
                 Spacer()
-                Button {
-                    Task { await monitor.refresh() }
-                } label: {
-                    Label(monitor.isChecking ? "Checking…" : "Check Now", systemImage: "arrow.clockwise")
+                HStack(spacing: 8) {
+                    // "Check" stays put while checking; only its icon turns into a spinner.
+                    Button {
+                        Task { await monitor.refresh() }
+                    } label: {
+                        Label {
+                            Text("Check")
+                        } icon: {
+                            if monitor.isChecking {
+                                ProgressView().controlSize(.small)
+                            } else {
+                                Image(systemName: "arrow.clockwise")
+                            }
+                        }
+                    }
+                    .prominentButton()
+                    .disabled(!monitor.hasToken || monitor.isChecking)
+                    .help("Check GitHub now")
+
+                    Button {
+                        monitor.openDashboard()
+                    } label: {
+                        Label("Dashboard", systemImage: "list.bullet.rectangle")
+                    }
+                    .glassButton()
+                    .help(monitor.dashboardURL == nil
+                          ? "Opens Safari. The dashboard opens from here once the Safari extension has run."
+                          : "Open the dashboard in Safari")
                 }
-                .prominentButton()
-                .disabled(!monitor.hasToken || monitor.isChecking)
             }
 
             let summary = monitor.summary
             HStack(spacing: 10) {
-                tile(summary?.items(of: .reviewRequest).count, "Review requests", .purple, Links.reviewRequests)
-                tile(summary?.items(of: .assigned).count, "Assigned", .green, Links.issues)
-                tile(summary?.items(of: .pullRequest).count, "Your PRs", .blue, Links.pullRequests)
-                tile(summary?.items(of: .notification).count, "Unread", .orange, Links.notifications)
+                tile(summary?.items(of: .reviewRequest).count, "Review requests", AttentionItem.Kind.reviewRequest.color, Links.reviewRequests)
+                tile(summary?.items(of: .assigned).count, "Assigned", AttentionItem.Kind.assigned.color, Links.issues)
+                tile(summary?.items(of: .pullRequest).count, "Your PRs", AttentionItem.Kind.pullRequest.color, Links.pullRequests)
+                tile(summary?.items(of: .notification).count, "Unread", AttentionItem.Kind.notification.color, Links.notifications)
             }
 
             if let errors = summary?.errors, !errors.isEmpty {
@@ -428,6 +450,15 @@ private extension View {
             glassEffect(interactive ? .regular.interactive() : .regular, in: .rect(cornerRadius: 12))
         } else {
             background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        }
+    }
+
+    @ViewBuilder
+    func glassButton() -> some View {
+        if #available(macOS 26, *) {
+            buttonStyle(.glass)
+        } else {
+            buttonStyle(.bordered)
         }
     }
 

@@ -11,7 +11,7 @@ let status = { available: false, hasToken: false, summary: null };
 
 async function refresh() {
     try {
-        status = await browser.runtime.sendNativeMessage(NATIVE_APP, { type: "status" });
+        status = await browser.runtime.sendNativeMessage(NATIVE_APP, { type: "status", dashboard: DASHBOARD });
     } catch (error) {
         console.error("GitIt: native message failed", error);
         status = { available: false, hasToken: false, summary: null, error: String(error) };
@@ -22,7 +22,7 @@ async function refresh() {
 
 async function requestCheckNow() {
     try {
-        status = await browser.runtime.sendNativeMessage(NATIVE_APP, { type: "refresh" });
+        status = await browser.runtime.sendNativeMessage(NATIVE_APP, { type: "refresh", dashboard: DASHBOARD });
     } catch (error) {
         console.error("GitIt: native message failed", error);
     }

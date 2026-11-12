@@ -1,0 +1,69 @@
+/* The look shared by the popup and the dashboard: base colours, the status colours,
+   and the dots and tags that use them. The Mac app uses the same status colours
+   (GitIt/StatusColors.swift); change them in both places. */
+
+:root {
+    color-scheme: light dark;
+    --surface: #ffffff;
+    --hover: #f3f5f7;
+    --text: #1f2328;
+    --muted: #6e7781;
+    --border: #e4e7eb;
+    --accent: #2f7cf6;
+    --badge: #ef4444;
+    --ok: #16a34a;
+
+    --review: #8b5cf6;
+    --assigned: #16a34a;
+    --pr: #2f7cf6;
+    --notify: #f97316;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --surface: #1c1f24;
+        --hover: #262a31;
+        --text: #e6edf3;
+        --muted: #8d96a0;
+        --border: #30363d;
+        --accent: #60a5fa;
+        --badge: #f87171;
+        --ok: #4ade80;
+
+        --review: #a78bfa;
+        --assigned: #4ade80;
+        --pr: #60a5fa;
+        --notify: #fb923c;
+    }
+}
+
+/* The dot before each item: why it needs you. */
+.dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+}
+
+.reviewRequest { --tint: var(--review); }
+.assigned { --tint: var(--assigned); }
+.pullRequest { --tint: var(--pr); }
+.notification, .unread { --tint: var(--notify); }
+
+.dot.reviewRequest, .dot.assigned, .dot.pullRequest, .dot.notification { background: var(--tint); }
+
+/* The tag on each item: a short reason, in the colour of its status. */
+.tag {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 6px;
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--tint, var(--muted)) 14%, transparent);
+    color: var(--tint, inherit);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 17px;
+    white-space: nowrap;
+}

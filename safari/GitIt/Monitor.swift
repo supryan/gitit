@@ -34,6 +34,23 @@ final class Monitor {
 
     var total: Int { summary?.total ?? 0 }
 
+    /// The dashboard page, once the Safari extension has reported where it lives.
+    var dashboardURL: URL? {
+        shared?.string(forKey: "dashboardURL").flatMap(URL.init(string:))
+    }
+
+    /// Opens the dashboard in Safari; without its address yet, just brings Safari forward.
+    func openDashboard() {
+        guard let safari = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.Safari") else { return }
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.activates = true
+        if let url = dashboardURL {
+            NSWorkspace.shared.open([url], withApplicationAt: safari, configuration: configuration)
+        } else {
+            NSWorkspace.shared.openApplication(at: safari, configuration: configuration)
+        }
+    }
+
     func start() {
         observer = DistributedNotificationCenter.default().addObserver(
             forName: Self.refreshRequest, object: nil, queue: .main

@@ -12,9 +12,26 @@ const meta = document.getElementById("meta");
 const notice = document.getElementById("notice");
 const checkButton = document.getElementById("check");
 const filters = document.getElementById("filters");
+const orgSelect = document.getElementById("org");
+const repoSelect = document.getElementById("repo");
 
 let status = null;
 let filter = "all";
+let org = "all";
+let repo = "all";
+try {
+    org = localStorage.getItem("org") || "all";
+    repo = localStorage.getItem("repo") || "all";
+} catch (_) { /* no storage */ }
+
+function remember() {
+    try {
+        localStorage.setItem("org", org);
+        localStorage.setItem("repo", repo);
+    } catch (_) { /* no storage */ }
+}
+
+const orgOf = (item) => item.repository.split("/")[0];
 
 function relative(iso) {
     const diff = Date.now() - Date.parse(iso);
@@ -55,12 +72,8 @@ function row(item) {
     body.appendChild(title);
 
     const sub = el("div", "item-sub");
-    const where = item.number ? `${item.repository} #${item.number}` : item.repository;
-    sub.appendChild(document.createTextNode(where));
-    if (item.reason) {
-        sub.appendChild(document.createTextNode(" · "));
-        sub.appendChild(el("span", item.hasUnread ? "unread" : "", item.reason));
-    }
+    sub.appendChild(statusTag(item));
+    sub.appendChild(el("span", "where", whereText(item)));
     body.appendChild(sub);
     link.appendChild(body);
 
@@ -98,12 +111,25 @@ function render() {
         showNotice(summary.errors.join(" "));
     }
 
-    for (const button of filters.querySelectorAll("[data-count]")) {
-        const kind = button.dataset.count;
-        button.textContent = String(kind === "all" ? items.length : items.filter((i) => i.kind === kind).length);
+    // A remembered organization or project that no longer has anything: back to all.
+    if (org !== "all" && !items.some((i) => orgOf(i) === org)) org = "all";
+    if (repo !== "all" && !items.some((i) => i.repository === repo && (org === "all" || orgOf(i) === org))) repo = "all";
+    remember();
+
+    // Each control counts what the other filters leave.
+    const ofKind = filter === "all" ? items : items.filter((i) => i.kind === filter);
+    fillSelect(orgSelect, "All orgs", items.map(orgOf), ofKind.map(orgOf), org, (name) => name);
+    const inOrg = (list) => (org === "all" ? list : list.filter((i) => orgOf(i) === org));
+    fillSelect(repoSelect, "All projects", inOrg(items).map((i) => i.repository), inOrg(ofKind).map((i) => i.repository), repo,
+        (name) => (org === "all" ? name : name.slice(org.length + 1)));
+
+    const scoped = inOrg(items).filter((i) => repo === "all" || i.repository === repo);
+    for (const badge of filters.querySelectorAll("[data-count]")) {
+        const kind = badge.dataset.count;
+        badge.textContent = String(kind === "all" ? scoped.length : scoped.filter((i) => i.kind === kind).length);
     }
 
-    const visible = filter === "all" ? items : items.filter((i) => i.kind === filter);
+    const visible = filter === "all" ? scoped : scoped.filter((i) => i.kind === filter);
     if (visible.length === 0) {
         const empty = el("div", "empty");
         empty.appendChild(el("strong", "", items.length === 0 ? "You're all caught up" : "Nothing here"));
@@ -115,9 +141,36 @@ function render() {
     for (const group of GROUPS) {
         const rows = visible.filter((i) => i.kind === group.kind);
         if (rows.length === 0) continue;
-        list.appendChild(el("h2", "group-title", `${group.title} · ${rows.length}`));
+        const heading = el("h2", "group-title");
+        heading.appendChild(el("span", `dot ${group.kind}`));
+        const label = el("span", "", group.title);
+        label.appendChild(el("span", "count", String(rows.length)));
+        heading.appendChild(label);
+        list.appendChild(heading);
         for (const item of rows) list.appendChild(row(item));
     }
+}
+
+// Rebuilds a dropdown: `allLabel`, then every name in `names`, most items first, each with
+// how many of `counted` it has. Leaves it alone when nothing changed, so an open menu
+// is not yanked away by the once-a-minute refresh.
+function fillSelect(select, allLabel, names, counted, selected, label) {
+    const counts = new Map();
+    for (const name of new Set(names)) counts.set(name, 0);
+    for (const name of counted) counts.set(name, (counts.get(name) || 0) + 1);
+    const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    const options = [["all", `${allLabel} · ${counted.length}`], ...sorted.map(([name, n]) => [name, `${label(name)} · ${n}`])];
+    const key = JSON.stringify(options);
+    if (select.dataset.key !== key) {
+        select.replaceChildren(...options.map(([value, text]) => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = text;
+            return option;
+        }));
+        select.dataset.key = key;
+    }
+    select.value = selected;
 }
 
 function showNotice(text) {
@@ -139,6 +192,19 @@ filters.addEventListener("click", (event) => {
     if (!button) return;
     filter = button.dataset.filter;
     for (const b of filters.querySelectorAll("[data-filter]")) b.classList.toggle("active", b === button);
+    render();
+});
+
+orgSelect.addEventListener("change", () => {
+    org = orgSelect.value;
+    repo = "all";
+    remember();
+    render();
+});
+
+repoSelect.addEventListener("change", () => {
+    repo = repoSelect.value;
+    remember();
     render();
 });
 
