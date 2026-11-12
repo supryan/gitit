@@ -72,11 +72,11 @@ struct SettingsView: View {
                         .font(.title2.weight(.semibold))
                     headline
                         .font(.callout)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.headerSubtitle)
                     if let checkedAt = monitor.summary?.checkedAt {
                         (Text("Checked ") + Text(checkedAt, style: .relative) + Text(" ago"))
                             .font(.caption)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(Color.headerSubtitle)
                             .monospacedDigit()
                     }
                 }
@@ -178,9 +178,7 @@ struct SettingsView: View {
                 HStack(spacing: 12) {
                     Text("Token")
                     DotRow()
-                        .mask(LinearGradient(
-                            stops: [.init(color: .black, location: 0), .init(color: .black, location: 0.5), .init(color: .clear, location: 1)],
-                            startPoint: .leading, endPoint: .trailing))
+                        .accessibilityLabel("Saved token, hidden")
                 }
             } else {
                 SecureField("Token", text: $tokenDraft, prompt: Text("Paste a personal access token"))
@@ -403,13 +401,26 @@ private struct DotRow: View {
             var x: CGFloat = 0
             while x + diameter <= size.width {
                 let rect = CGRect(x: x, y: (size.height - diameter) / 2, width: diameter, height: diameter)
-                context.fill(Path(ellipseIn: rect), with: .color(.secondary.opacity(0.55)))
+                context.fill(Path(ellipseIn: rect), with: .color(.primary))
                 x += pitch
             }
         }
         .frame(maxWidth: .infinity)
         .frame(height: 12)
     }
+}
+
+// MARK: - Header colour
+
+private extension Color {
+    /// The header's account line and "Checked … ago": a grey that stays readable on the
+    /// translucent window (5.9:1 light, 5.5:1 dark), where the system's secondary and
+    /// tertiary greys wash out.
+    static let headerSubtitle = Color(nsColor: NSColor(name: nil) { appearance in
+        appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+            ? NSColor(srgbRed: 0xB4 / 255, green: 0xB4 / 255, blue: 0xB4 / 255, alpha: 1)
+            : NSColor(srgbRed: 0x54 / 255, green: 0x54 / 255, blue: 0x54 / 255, alpha: 1)
+    })
 }
 
 // MARK: - Browsers
