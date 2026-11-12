@@ -26,6 +26,7 @@ final class Monitor {
     private let defaults = UserDefaults.standard
     private let seenKey = "seenItemIds"
     private let seenPrimedKey = "seenItemsPrimed"
+    private let lastCheckKey = "lastCheckedAt"
 
     /// The suite shared with the extension; nil when the entitlement did not take.
     static let appGroup = Bundle.main.object(forInfoDictionaryKey: "GitItAppGroup") as? String
@@ -63,6 +64,7 @@ final class Monitor {
             publish(nil)
             defaults.removeObject(forKey: seenKey)
             defaults.removeObject(forKey: seenPrimedKey)
+            defaults.removeObject(forKey: lastCheckKey)
         }
         restartLoop()
     }
@@ -89,7 +91,7 @@ final class Monitor {
         )
         self.summary = summary
         publish(summary)
-        notifyAboutNew(in: summary.items)
+        notifyAboutNew(in: summary.items, checkedAt: summary.checkedAt)
     }
 
     /// Re-publishes the last result with the current settings, without another check.
@@ -113,17 +115,26 @@ final class Monitor {
         shared.set(hasToken, forKey: "hasToken")
     }
 
-    /// Notifies once per item, the first time it is seen. The very first check after a
-    /// token is saved only primes the list, so an existing backlog does not fire a storm.
-    private func notifyAboutNew(in items: [AttentionItem]) {
+    /// Notifies once per item, the first time it is seen with recent activity. The very
+    /// first check after a token is saved only primes the list, so an existing backlog
+    /// does not fire a storm.
+    private func notifyAboutNew(in items: [AttentionItem], checkedAt: Date) {
         let current = Set(items.map(\.id))
         let primed = defaults.bool(forKey: seenPrimedKey)
         let seen = Set(defaults.stringArray(forKey: seenKey) ?? [])
+        let previousCheck = defaults.object(forKey: lastCheckKey) as? Date
         defaults.set(Array(current), forKey: seenKey)
         defaults.set(true, forKey: seenPrimedKey)
+        defaults.set(checkedAt, forKey: lastCheckKey)
         guard primed else { return }
 
-        let new = items.filter { !seen.contains($0.id) }
+        // An item is news only if something happened to it since the last check. An old
+        // item that merely reappears (a request that failed last time, a list that
+        // shifted) is not. The slack covers clock skew and GitHub's search index lag.
+        // No saved time (first run after upgrading): assume the last check was one interval ago.
+        let since = previousCheck ?? checkedAt.addingTimeInterval(-Double(settings.checkIntervalMinutes) * 60)
+        let cutoff = since.addingTimeInterval(-10 * 60)
+        let new = items.filter { !seen.contains($0.id) && $0.updatedAt > cutoff }
         guard !new.isEmpty else { return }
         guard settings.showSystemNotifications, !settings.muteNotifications else { return }
         notifier.notify(new: new)

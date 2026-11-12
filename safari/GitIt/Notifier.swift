@@ -8,6 +8,13 @@ final class Notifier: NSObject, UNUserNotificationCenterDelegate {
     private let center = UNUserNotificationCenter.current()
     private(set) var authorized = false
 
+    /// When a notification was last clicked. The app delegate uses it to tell a click,
+    /// which also reopens the app, from the user opening GitIt to see its window.
+    private var lastClickAt: Date?
+    var respondedRecently: Bool {
+        lastClickAt.map { Date().timeIntervalSince($0) < 2 } ?? false
+    }
+
     func prepare() {
         center.delegate = self
         center.getNotificationSettings { [weak self] settings in
@@ -67,6 +74,7 @@ final class Notifier: NSObject, UNUserNotificationCenterDelegate {
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
         defer { completionHandler() }
+        DispatchQueue.main.async { self.lastClickAt = Date() }
         guard let raw = response.notification.request.content.userInfo["url"] as? String else { return }
         if raw == "gitit://dashboard" {
             NSWorkspace.shared.open(Links.pullRequests)

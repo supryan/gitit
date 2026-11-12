@@ -1,5 +1,5 @@
 // Draws the app icon and the extension icons: a dark rounded square, a white inbox tray
-// and a red dot. Run from safari/: swift scripts/make-icons.swift (or make icons)
+// and a red badge dot on its corner. Run from safari/: swift scripts/make-icons.swift (or make icons)
 import AppKit
 
 let root = URL(fileURLWithPath: CommandLine.arguments.count > 1 ? CommandLine.arguments[1] : FileManager.default.currentDirectoryPath)
@@ -59,14 +59,22 @@ func draw(size: CGFloat, macStyle: Bool) -> Data {
     transform.scale(0.62)
     transform.translate(x: -frame.midX, y: -frame.midY)
     tray.transform(using: transform)
+
+    // The badge dot sits on the tray's top-right corner, like an unread badge, with a
+    // gap cut out of the tray around it so the two never touch.
+    let center = p(12.1, 3.7)
+    let dotRadius = 2.1 * s
+    let gap = 0.55 * s
+    context.saveGState()
+    context.addRect(CGRect(x: 0, y: 0, width: size, height: size))
+    context.addEllipse(in: CGRect(x: center.x - dotRadius - gap, y: center.y - dotRadius - gap, width: (dotRadius + gap) * 2, height: (dotRadius + gap) * 2))
+    context.clip(using: .evenOdd)
     NSColor.white.setFill()
     tray.fill()
+    context.restoreGState()
 
-    // The badge dot, top right.
-    let dot = frame.width * 0.26
-    let dotRect = CGRect(x: frame.maxX - dot * 1.05, y: frame.maxY - dot * 1.05, width: dot, height: dot)
     NSColor(red: 0.95, green: 0.25, blue: 0.25, alpha: 1).setFill()
-    NSBezierPath(ovalIn: dotRect).fill()
+    NSBezierPath(ovalIn: CGRect(x: center.x - dotRadius, y: center.y - dotRadius, width: dotRadius * 2, height: dotRadius * 2)).fill()
 
     image.unlockFocus()
 

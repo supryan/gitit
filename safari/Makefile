@@ -27,6 +27,8 @@ install: build
 	@if pgrep -xq GitIt; then echo "Quitting the running GitIt…"; osascript -e 'tell application "GitIt" to quit' || true; sleep 1; fi
 	rm -rf "$(DEST)"
 	ditto "$(APP)" "$(DEST)"
+	@# ditto keeps the bundle's dates, so Finder and the Dock would keep the cached icon.
+	touch "$(DEST)"
 	@# Forget the copy in ./build so Safari lists only the installed extension.
 	$(LSREGISTER) -u "$(APP)" || true
 	@echo "Installed $(DEST)"

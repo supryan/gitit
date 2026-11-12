@@ -19,6 +19,7 @@ final class AppSettings {
         static let interval = "checkIntervalMinutes"
         static let popupCount = "popupItemCount"
         static let menuBar = "showMenuBarIcon"
+        static let menuBarStyle = "menuBarIconStyle"
     }
 
     /// How many items each tab of the Safari popup lists.
@@ -30,6 +31,10 @@ final class AppSettings {
     /// opening it again from Finder or Spotlight brings the settings window back.
     var showMenuBarIcon: Bool {
         didSet { defaults.set(showMenuBarIcon, forKey: Key.menuBar) }
+    }
+
+    var menuBarIconStyle: MenuBarIconStyle {
+        didSet { defaults.set(menuBarIconStyle.rawValue, forKey: Key.menuBarStyle) }
     }
 
     var muteNotifications: Bool {
@@ -73,6 +78,7 @@ final class AppSettings {
             Key.menuBar: true,
         ])
         showMenuBarIcon = defaults.bool(forKey: Key.menuBar)
+        menuBarIconStyle = defaults.string(forKey: Key.menuBarStyle).flatMap(MenuBarIconStyle.init) ?? .count
         muteNotifications = defaults.bool(forKey: Key.mute)
         showSystemNotifications = defaults.bool(forKey: Key.system)
         let stored = defaults.integer(forKey: Key.interval)

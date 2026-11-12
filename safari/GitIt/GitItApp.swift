@@ -1,22 +1,15 @@
 import SwiftUI
 
+/// The app runs from its delegate: the menu bar item (StatusItem.swift) and the settings
+/// window (SettingsWindow.swift) are AppKit. SwiftUI still provides the app lifecycle and
+/// the standard menus, which give the token field ⌘V and the other edit shortcuts.
 @main
 struct GitItApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
-    @State private var settings = AppSettings.shared
 
     var body: some Scene {
-        Window("GitIt", id: "main") {
-            SettingsView()
-        }
-        .windowResizability(.contentSize)
-        .defaultPosition(.center)
-
-        // Also flips off if the user ⌘-drags the item out of the menu bar.
-        MenuBarExtra(isInserted: $settings.showMenuBarIcon) {
-            MenuBarView()
-        } label: {
-            MenuBarLabel()
-        }
+        // A scene is required; this one never opens a window.
+        Settings { EmptyView() }
+            .commandsRemoved()
     }
 }

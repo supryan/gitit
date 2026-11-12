@@ -141,14 +141,23 @@ actor GitHubClient {
         do { return .success(try await work()) } catch { return .failure(error) }
     }
 
+    /// Every page of a search, not just the first 100. Stopping at one page made the
+    /// 101st item slide in whenever one of the first 100 closed, and look new.
+    /// GitHub serves at most 1,000 results (10 pages) per search.
     private func search(_ query: String, token: String) async throws -> [SearchItem] {
-        let response: SearchResponse = try await get("/search/issues", query: [
-            URLQueryItem(name: "q", value: query),
-            URLQueryItem(name: "per_page", value: "100"),
-            URLQueryItem(name: "sort", value: "updated"),
-            URLQueryItem(name: "advanced_search", value: "true"),
-        ], token: token)
-        return response.items
+        var items: [SearchItem] = []
+        for page in 1...10 {
+            let response: SearchResponse = try await get("/search/issues", query: [
+                URLQueryItem(name: "q", value: query),
+                URLQueryItem(name: "per_page", value: "100"),
+                URLQueryItem(name: "page", value: String(page)),
+                URLQueryItem(name: "sort", value: "updated"),
+                URLQueryItem(name: "advanced_search", value: "true"),
+            ], token: token)
+            items += response.items
+            if response.items.count < 100 || items.count >= response.totalCount { break }
+        }
+        return items
     }
 
     private func notifications(token: String) async throws -> [NotificationThread] {
@@ -220,6 +229,7 @@ private struct User: Decodable {
 }
 
 private struct SearchResponse: Decodable {
+    let totalCount: Int
     let items: [SearchItem]
 }
 
