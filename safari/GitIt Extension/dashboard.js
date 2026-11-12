@@ -19,9 +19,13 @@ let status = null;
 let filter = "all";
 let org = "all";
 let repo = "all";
+// The groups folded shut, by kind. Kept between visits.
+let collapsed = new Set();
 try {
     org = localStorage.getItem("org") || "all";
     repo = localStorage.getItem("repo") || "all";
+    const saved = JSON.parse(localStorage.getItem("collapsed") || "[]");
+    if (Array.isArray(saved)) collapsed = new Set(saved);
 } catch (_) { /* no storage */ }
 
 function remember() {
@@ -141,14 +145,55 @@ function render() {
     for (const group of GROUPS) {
         const rows = visible.filter((i) => i.kind === group.kind);
         if (rows.length === 0) continue;
-        const heading = el("h2", "group-title");
-        heading.appendChild(el("span", `dot ${group.kind}`));
-        const label = el("span", "", group.title);
-        label.appendChild(el("span", "count", String(rows.length)));
-        heading.appendChild(label);
-        list.appendChild(heading);
-        for (const item of rows) list.appendChild(row(item));
+        list.appendChild(section(group, rows));
     }
+}
+
+// One group: a heading that folds it, then its rows. Built already folded or open, so the
+// once-a-minute refresh never replays the animation.
+function section(group, rows) {
+    const box = el("section", "group");
+    box.dataset.kind = group.kind;
+    box.classList.toggle("collapsed", collapsed.has(group.kind));
+
+    const heading = el("h2", "group-heading");
+    const toggle = el("button", "group-title");
+    toggle.type = "button";
+    toggle.setAttribute("aria-expanded", String(!collapsed.has(group.kind)));
+    toggle.setAttribute("aria-controls", `group-${group.kind}`);
+    toggle.title = "Collapse or expand · Option-click for every section";
+    toggle.appendChild(el("span", `dot ${group.kind}`));
+    const label = el("span", "", group.title);
+    label.appendChild(el("span", "count", String(rows.length)));
+    toggle.appendChild(label);
+    toggle.insertAdjacentHTML("beforeend", CHEVRON);
+    toggle.addEventListener("click", (event) => {
+        const fold = !collapsed.has(group.kind);
+        const kinds = event.altKey ? GROUPS.map((g) => g.kind) : [group.kind];
+        for (const kind of kinds) setCollapsed(kind, fold);
+    });
+    heading.appendChild(toggle);
+    box.appendChild(heading);
+
+    const body = el("div", "group-rows");
+    body.id = `group-${group.kind}`;
+    const inner = el("div", "group-inner");
+    for (const item of rows) inner.appendChild(row(item));
+    body.appendChild(inner);
+    box.appendChild(body);
+    return box;
+}
+
+const CHEVRON = '<svg class="group-chevron" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m4.5 6 3.5 3.5L11.5 6"/></svg>';
+
+function setCollapsed(kind, fold) {
+    if (fold) collapsed.add(kind);
+    else collapsed.delete(kind);
+    try { localStorage.setItem("collapsed", JSON.stringify([...collapsed])); } catch (_) { /* no storage */ }
+    const box = list.querySelector(`.group[data-kind="${kind}"]`);
+    if (!box) return;
+    box.classList.toggle("collapsed", fold);
+    box.querySelector(".group-title").setAttribute("aria-expanded", String(!fold));
 }
 
 // Rebuilds a dropdown: `allLabel`, then every name in `names`, most items first, each with
