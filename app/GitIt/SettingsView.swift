@@ -126,7 +126,7 @@ struct SettingsView: View {
                         Label("Dashboard", systemImage: "list.bullet.rectangle")
                     }
                     .glassButton()
-                    .disabled(!monitor.isDashboardReady)
+                    .disabled(!monitor.hasToken || !monitor.isDashboardReady)
                     .help(monitor.isDashboardReady
                           ? "Open the dashboard in your browser"
                           : "Available once a browser extension is on and has run.")
@@ -183,8 +183,9 @@ struct SettingsView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .card(interactive: true)
-        .help("Open on GitHub")
+        .card(interactive: monitor.hasToken)
+        .disabled(!monitor.hasToken)
+        .help(monitor.hasToken ? "Open on GitHub" : "")
     }
 
     // MARK: Sections
@@ -196,7 +197,11 @@ struct SettingsView: View {
                 // input, which blocks other apps' shortcuts for as long as the window is open.
                 HStack(spacing: 12) {
                     Text("Token")
-                    DotRow()
+                    Spacer(minLength: 0)
+                    // The bullets a password field shows, one per character of a classic token
+                    // ("ghp_" and 36 more).
+                    Text(String(repeating: "\u{2022}", count: 40))
+                        .lineLimit(1)
                         .accessibilityLabel("Saved token, hidden")
                 }
             } else {
@@ -471,27 +476,6 @@ struct SettingsView: View {
         } catch {
             extensionState = .error("Safari has not seen the extension yet. Keep GitIt in ~/Applications and open it once; then enable it in Safari > Settings > Extensions.")
         }
-    }
-}
-
-// MARK: - Token dots
-
-/// A row of dots standing in for the saved token, as many as fit. Drawn, not text: a
-/// text of dots would give the form a huge ideal width and push every row off the window.
-private struct DotRow: View {
-    var body: some View {
-        Canvas { context, size in
-            let diameter: CGFloat = 3
-            let pitch: CGFloat = 6.5
-            var x: CGFloat = 0
-            while x + diameter <= size.width {
-                let rect = CGRect(x: x, y: (size.height - diameter) / 2, width: diameter, height: diameter)
-                context.fill(Path(ellipseIn: rect), with: .color(.primary))
-                x += pitch
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: 12)
     }
 }
 
