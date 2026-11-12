@@ -59,6 +59,7 @@
 			membershipExceptions = (
 				.claude,
 				Info.plist,
+				README.md,
 			);
 			target = 1A0000000000000000000020 /* GitIt Extension */;
 		};
@@ -66,6 +67,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				.claude,
+				README.md,
 				icons/icon-16.png,
 				icons/icon-32.png,
 				icons/icon-48.png,

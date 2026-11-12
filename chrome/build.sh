@@ -10,8 +10,9 @@ out="$here/build/GitIt for Chrome"
 
 rm -rf "$out"
 mkdir -p "$out"
-# Everything in shared/ except hidden files and folders (.DS_Store, tools' marker folders).
-rsync -a --exclude='.*' "$here/../shared/" "$out/"
+# Everything in shared/ except hidden files and folders (.DS_Store, tools' marker folders)
+# and its README.
+rsync -a --exclude='.*' --exclude='README.md' "$here/../shared/" "$out/"
 cp "$here/manifest.json" "$here/background.js" "$out/"
 cp "$here"/icons/*.png "$out/icons/" # the toolbar icons, without the dot
 echo "Built $out"

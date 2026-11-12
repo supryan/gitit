@@ -49,30 +49,36 @@ final class AppSettings {
         didSet { defaults.set(checkIntervalMinutes, forKey: Key.interval) }
     }
 
-    /// Mirrors SMAppService; setting it registers or unregisters the app as a login item.
-    var launchAtLogin: Bool {
-        didSet {
-            guard launchAtLogin != oldValue else { return }
-            do {
-                if launchAtLogin {
-                    try SMAppService.mainApp.register()
-                } else {
-                    try SMAppService.mainApp.unregister()
-                }
-                launchAtLoginError = nil
-            } catch {
-                launchAtLoginError = error.localizedDescription
-                launchAtLogin = SMAppService.mainApp.status == .enabled
-            }
-        }
-    }
+    /// Whether GitIt opens at login, as macOS has it. System Settings can change it too, so
+    /// reading it back (refreshLaunchAtLogin) never registers or unregisters anything; only
+    /// the toggle does, through setLaunchAtLogin.
+    private(set) var launchAtLogin: Bool
+
+    /// macOS registered the login item but wants the user to allow it in System Settings.
+    private(set) var launchAtLoginNeedsApproval: Bool
 
     private(set) var launchAtLoginError: String?
+
+    /// The toggle: registers or unregisters GitIt as a login item, then shows what macOS reports.
+    func setLaunchAtLogin(_ on: Bool) {
+        let service = SMAppService.mainApp
+        do {
+            if on {
+                try service.register()
+            } else if service.status != .notRegistered {
+                try service.unregister()
+            }
+            launchAtLoginError = nil
+        } catch {
+            launchAtLoginError = error.localizedDescription
+        }
+        refreshLaunchAtLogin()
+    }
 
     private init() {
         defaults.register(defaults: [
             Key.mute: false,
-            Key.system: true,
+            Key.system: false,
             Key.interval: 1,
             Key.popupCount: 5,
             Key.menuBar: true,
@@ -85,13 +91,16 @@ final class AppSettings {
         checkIntervalMinutes = Self.intervalChoices.contains(stored) ? stored : 1
         let storedCount = defaults.integer(forKey: Key.popupCount)
         popupItemCount = Self.popupCountChoices.contains(storedCount) ? storedCount : 5
-        launchAtLogin = SMAppService.mainApp.status == .enabled
+        let loginStatus = SMAppService.mainApp.status
+        launchAtLogin = loginStatus == .enabled || loginStatus == .requiresApproval
+        launchAtLoginNeedsApproval = loginStatus == .requiresApproval
     }
 
     /// Re-reads the login item state, which System Settings can change behind our back.
     func refreshLaunchAtLogin() {
-        let enabled = SMAppService.mainApp.status == .enabled
-        if enabled != launchAtLogin { launchAtLogin = enabled }
+        let status = SMAppService.mainApp.status
+        launchAtLogin = status == .enabled || status == .requiresApproval
+        launchAtLoginNeedsApproval = status == .requiresApproval
     }
 
     static func label(forMinutes minutes: Int) -> String {

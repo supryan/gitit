@@ -15,17 +15,52 @@ final class Notifier: NSObject, UNUserNotificationCenterDelegate {
         lastClickAt.map { Date().timeIntervalSince($0) < 2 } ?? false
     }
 
+    /// Posted after the permission prompt is answered, so Settings can show the result.
+    static let permissionChanged = Notification.Name("GitItNotificationPermissionChanged")
+
+    enum Permission {
+        /// macOS has not asked yet; GitIt is not listed in System Settings > Notifications.
+        case notAsked
+        case allowed
+        /// Turned off for GitIt in System Settings > Notifications.
+        case denied
+    }
+
+    /// Runs at launch. It never asks for permission: that waits until the user turns
+    /// "Show system notifications" on.
+    @MainActor
     func prepare() {
         center.delegate = self
-        center.getNotificationSettings { [weak self] settings in
-            self?.authorized = settings.authorizationStatus == .authorized
+        Task { @MainActor in
+            authorized = await permission() == .allowed
         }
     }
 
-    func requestAuthorization() {
+    func permission() async -> Permission {
+        switch await center.notificationSettings().authorizationStatus {
+        case .notDetermined: return .notAsked
+        case .denied: return .denied
+        default: return .allowed
+        }
+    }
+
+    /// Shows macOS's permission prompt the first time; after that macOS answers with what
+    /// the user chose before, without asking again. Asking is also what lists GitIt in
+    /// System Settings > Notifications.
+    func requestAuthorization(completion: (@MainActor (Bool) -> Void)? = nil) {
         center.requestAuthorization(options: [.alert, .sound, .badge]) { [weak self] granted, _ in
             self?.authorized = granted
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: Self.permissionChanged, object: nil)
+                completion?(granted)
+            }
         }
+    }
+
+    /// System Settings' Notifications pane, at GitIt.
+    static var settingsURL: URL {
+        let id = Bundle.main.bundleIdentifier ?? "com.gitit.app"
+        return URL(string: "x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=\(id)")!
     }
 
     /// One notification per item up to three; past that, a single summary so a busy

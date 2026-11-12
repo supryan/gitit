@@ -1,4 +1,5 @@
 import SafariServices
+import ServiceManagement
 import SwiftUI
 
 /// The app's one window: a header with the account and the counts, then GitHub,
@@ -14,6 +15,7 @@ struct SettingsView: View {
     @State private var extensionState: ExtensionState = .unknown
     @State private var chrome = ChromeExtension.shared
     @State private var showingChromeSetup = false
+    @State private var notificationPermission: Notifier.Permission = .allowed
     @State private var chromeError: String?
 
     private let extensionId = (Bundle.main.bundleIdentifier ?? "com.gitit.app") + ".Extension"
@@ -51,11 +53,20 @@ struct SettingsView: View {
         }
         .background(WindowBackground().ignoresSafeArea())
         .frame(width: 560, height: 740)
-        .task { await refreshExtensionState() }
+        .task {
+            await refreshExtensionState()
+            notificationPermission = await Notifier.shared.permission()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: Notifier.permissionChanged)) { _ in
+            Task { notificationPermission = await Notifier.shared.permission() }
+        }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             settings.refreshLaunchAtLogin()
             chrome.refresh()
-            Task { await refreshExtensionState() }
+            Task {
+                await refreshExtensionState()
+                notificationPermission = await Notifier.shared.permission()
+            }
         }
         .sheet(isPresented: $showingChromeSetup) {
             ChromeSetupSheet(chrome: chrome) { showingChromeSetup = false }
@@ -223,8 +234,27 @@ struct SettingsView: View {
         Section("Notifications") {
             Toggle("Show system notifications", isOn: $settings.showSystemNotifications)
                 .onChange(of: settings.showSystemNotifications) { _, on in
-                    if on { Notifier.shared.requestAuthorization() }
+                    guard on else { return }
+                    Task {
+                        // First time: macOS's prompt. Don't Allow switches the toggle back off.
+                        // Denied before: macOS won't ask again, so the note below points to
+                        // System Settings instead.
+                        guard await Notifier.shared.permission() == .notAsked else { return }
+                        Notifier.shared.requestAuthorization { granted in
+                            if !granted { settings.showSystemNotifications = false }
+                        }
+                    }
                 }
+            // The toggle is GitIt's wish; macOS has the final say.
+            if settings.showSystemNotifications, notificationPermission == .denied {
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Notifications are turned off for GitIt in System Settings.")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Open Settings") { NSWorkspace.shared.open(Notifier.settingsURL) }
+                }
+            }
             Toggle("Mute notifications", isOn: $settings.muteNotifications)
             Picker("Check every", selection: $settings.checkIntervalMinutes) {
                 ForEach(AppSettings.intervalChoices, id: \.self) { minutes in
@@ -240,7 +270,19 @@ struct SettingsView: View {
 
     private var generalSection: some View {
         Section {
-            Toggle("Launch at login", isOn: $settings.launchAtLogin)
+            Toggle("Launch at login", isOn: Binding(
+                get: { settings.launchAtLogin },
+                set: { settings.setLaunchAtLogin($0) }
+            ))
+            if settings.launchAtLoginNeedsApproval {
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Allow GitIt under Login Items in System Settings to finish.")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Open Settings") { SMAppService.openSystemSettingsLoginItems() }
+                }
+            }
             if let error = settings.launchAtLoginError {
                 Text(error).font(.callout).foregroundStyle(.red)
             }
