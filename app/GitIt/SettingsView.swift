@@ -198,10 +198,7 @@ struct SettingsView: View {
                 HStack(spacing: 12) {
                     Text("Token")
                     Spacer(minLength: 0)
-                    // The bullets a password field shows, one per character of a classic token
-                    // ("ghp_" and 36 more).
-                    Text(String(repeating: "\u{2022}", count: 40))
-                        .lineLimit(1)
+                    SavedTokenDots()
                         .accessibilityLabel("Saved token, hidden")
                 }
             } else {
@@ -566,6 +563,28 @@ private struct ChromeSetupSheet: View {
             }
         }
     }
+}
+
+// MARK: - Saved token
+
+/// The saved token as a real password field draws it: macOS's own secure text field, one
+/// bullet per character of a classic token ("ghp_" and 36 more). Neither editable nor
+/// selectable, so it never takes focus or turns on secure keyboard input.
+private struct SavedTokenDots: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSSecureTextField {
+        let field = NSSecureTextField(string: String(repeating: "x", count: 40))
+        field.isEditable = false
+        field.isSelectable = false
+        field.isBordered = false
+        field.drawsBackground = false
+        field.focusRingType = .none
+        field.alignment = .right
+        field.lineBreakMode = .byClipping
+        field.setContentHuggingPriority(.required, for: .horizontal)
+        return field
+    }
+
+    func updateNSView(_ field: NSSecureTextField, context: Context) {}
 }
 
 // MARK: - Browsers
