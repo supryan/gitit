@@ -41,8 +41,7 @@ Config/     Shared.xcconfig (ids, signing defaults), plus your gitignored Local.
 scripts/    icon drawing, build output filter, keep-one-gitit.sh
 ```
 
-The app's bundle id is `com.gitit.app` (it was `com.jickfive.gitit`; the first launch under
-the new id copies settings and the token across, see `GitIt/Migration.swift`).
+The app's bundle id is `com.gitit.app`.
 
 ## Troubleshooting
 
