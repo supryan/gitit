@@ -1,9 +1,18 @@
-# GitIt — each browser lives in its own folder. Targets here forward to safari/ for now.
+# GitIt
 #
-#   make install   build the Safari version and install GitIt.app to ~/Applications
+#   app/      the Mac app (Xcode project); it builds the Safari extension and carries the Chrome one
+#   safari/   the Safari extension's own files
+#   chrome/   the Chrome extension's own files
+#   shared/   the popup, dashboard, theme and icons both extensions use
+#
+#   make install   build the app and install it to ~/Applications
+#   make chrome    build the Chrome extension into chrome/build and register GitIt with Chrome
 #   make build | icons | clean
 
-.PHONY: build install icons clean
+.PHONY: build install icons clean chrome
 
 build install icons clean:
-	$(MAKE) -C safari $@
+	$(MAKE) -C app $@
+
+chrome:
+	$(MAKE) -C chrome install

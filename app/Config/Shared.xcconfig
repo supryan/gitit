@@ -1,0 +1,24 @@
+// Shared build settings for GitIt. Machine-specific signing goes in Local.xcconfig (gitignored).
+MACOSX_DEPLOYMENT_TARGET = 14.0
+SWIFT_VERSION = 5.0
+SWIFT_STRICT_CONCURRENCY = minimal
+// Keep equal to "version" in safari/manifest.json and chrome/manifest.json: Safari compares the two.
+MARKETING_VERSION = 1.0
+CURRENT_PROJECT_VERSION = 1
+
+// Identifiers. The extension's id is the app's id + ".Extension".
+GITIT_BUNDLE_ID = com.gitit.app
+// The app group the app writes its results into and the extension reads them from.
+// With a development team this becomes TEAMID.com.gitit.app, the classic macOS form,
+// which needs no registration with Apple.
+GITIT_APP_GROUP = $(TeamIdentifierPrefix)com.gitit.app
+
+// Signing. The default is ad-hoc ("Sign to Run Locally"): Safari then needs
+// Develop > Allow Unsigned Extensions. To sign with an Apple ID team instead, copy
+// Local.example.xcconfig to Local.xcconfig and fill it in.
+CODE_SIGN_STYLE = Manual
+CODE_SIGN_IDENTITY = -
+DEVELOPMENT_TEAM =
+ENABLE_HARDENED_RUNTIME = YES
+
+#include? "Local.xcconfig"

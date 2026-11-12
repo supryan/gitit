@@ -1,0 +1,338 @@
+/* The dashboard. Colours, status dots and tags come from theme.css, shared with the
+   popup, so the two read as one product; only the page around the list is its own. */
+
+:root {
+    --page: #f6f8fa;
+    --heading-bg: #f9fafb;
+    --faint: #8c959f;
+    --active: #eaeef2;
+    --warn-bg: #fff8e6;
+    --warn-border: #f5c26b;
+}
+
+/* The base type is set on body as well as the root, as in the popup: Chrome did not carry
+   the root's size down to text that inherits it. */
+:root,
+body {
+    font: 14px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --page: #15181d;
+        --heading-bg: #20242a;
+        --faint: #6e7681;
+        --active: #2d333b;
+        --warn-bg: #2a2111;
+        --warn-border: #6b4f12;
+    }
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0 auto;
+    padding: 36px 24px 56px;
+    max-width: 960px;
+    background: var(--page);
+    color: var(--text);
+}
+
+/* Header */
+
+.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.logo { flex: none; display: block; border-radius: 9px; }
+
+h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.2; }
+.meta { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+
+.button {
+    flex: none;
+    height: 32px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 120ms ease;
+}
+
+.button:hover { background: var(--hover); }
+.button:disabled { color: var(--muted); cursor: default; }
+
+.notice {
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    border: 1px solid var(--warn-border);
+    background: var(--warn-bg);
+    border-radius: 10px;
+    font-size: 13px;
+}
+
+.hidden { display: none; }
+
+/* Toolbar: status chips, then the two dropdowns, on one line */
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.filters { display: flex; flex: none; gap: 2px; }
+
+.filters button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 120ms ease, color 120ms ease;
+}
+
+.filters button:hover { background: var(--hover); color: var(--text); }
+.filters button.active { background: var(--surface); color: var(--text); box-shadow: 0 0 0 1px var(--border), 0 1px 2px rgba(0, 0, 0, 0.06); }
+
+.count {
+    color: var(--faint);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.filters button.active .count { color: var(--muted); }
+
+.selects { display: flex; gap: 8px; margin-left: auto; min-width: 0; }
+
+.select {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    height: 30px;
+    padding-left: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 120ms ease;
+}
+
+.select:hover { background: var(--hover); }
+.select:focus-within { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.select-icon { flex: none; }
+
+.select select {
+    appearance: none;
+    -webkit-appearance: none;
+    min-width: 0;
+    max-width: 150px;
+    height: 100%;
+    padding: 0 26px 0 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.select .chevron {
+    position: absolute;
+    right: 9px;
+    color: var(--muted);
+    pointer-events: none;
+}
+
+/* The list. Headings sit on the same grid as the rows: dot column, then text. */
+
+.list {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.group-title,
+.item {
+    display: grid;
+    grid-template-columns: 8px minmax(0, 1fr) auto;
+    column-gap: 14px;
+    align-items: center;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.group-heading { margin: 0; }
+
+/* The heading is one button: dot, title and count on the left, the chevron on the right. */
+.group-title {
+    width: 100%;
+    margin: 0;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--heading-bg);
+    color: var(--muted);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-align: left;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 120ms ease, border-color 200ms ease;
+}
+
+.group + .group .group-title { border-top: 1px solid var(--border); }
+.group-title .count { margin-left: 6px; letter-spacing: 0; }
+.group-title:hover { color: var(--text); }
+.group-title:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+.group-title .group-chevron {
+    display: block;
+    color: var(--muted);
+    transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1), color 120ms ease;
+}
+
+.group-title:hover .group-chevron { color: var(--text); }
+
+/* Folded: the rows shrink to nothing and the chevron points right. The heading's bottom
+   rule goes too, so it does not double with the next heading's top rule. */
+.group-rows {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.group-inner { min-height: 0; overflow: hidden; }
+
+.group.collapsed .group-rows { grid-template-rows: 0fr; }
+.group.collapsed .group-inner { visibility: hidden; transition: visibility 0s 220ms; }
+.group.collapsed .group-title { border-bottom-color: transparent; }
+.group.collapsed .group-chevron { transform: rotate(-90deg); }
+
+@media (prefers-reduced-motion: reduce) {
+    .group-rows, .group-title .group-chevron, .group.collapsed .group-inner { transition: none; }
+}
+
+.item {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: inherit;
+    text-decoration: none;
+    transition: background-color 100ms ease;
+}
+
+.item + .item { border-top: 1px solid var(--border); }
+.item:hover { background: var(--hover); }
+
+.item-title {
+    font-size: 14px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.item-title .draft {
+    margin-left: 6px;
+    padding: 0 6px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 500;
+    vertical-align: 1px;
+}
+
+.item-sub {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.item-sub .where { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.when { color: var(--muted); font-size: 12px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.empty {
+    padding: 56px 16px;
+    text-align: center;
+    color: var(--muted);
+}
+
+.empty strong { display: block; color: var(--text); font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+
+.links {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    color: var(--faint);
+    font-size: 13px;
+}
+
+.links a { color: var(--accent); text-decoration: none; font-weight: 500; }
+.links a:hover { text-decoration: underline; }
+
+/* Narrow windows: the dropdowns move under the chips, and the chips scroll sideways
+   on one line rather than wrapping. */
+@media (max-width: 900px) {
+    .toolbar { flex-wrap: wrap; }
+    .filters {
+        width: 100%;
+        /* Room for the active chip's ring, which the scroll area would otherwise clip. */
+        margin: -2px;
+        padding: 2px;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+    .filters::-webkit-scrollbar { display: none; }
+    .filters button { flex: none; }
+    .selects { width: 100%; margin-left: 0; }
+    .select { flex: 1; }
+    .select select { max-width: none; width: 100%; }
+}
+
+/* Phone-width windows: the list keeps a usable width and scrolls sideways inside its
+   rounded box instead of crushing titles to a few letters. */
+@media (max-width: 640px) {
+    .list { overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+    .group-title, .item { min-width: 560px; }
+}

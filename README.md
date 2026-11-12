@@ -1,4 +1,4 @@
-# <img src="safari/GitIt/Assets.xcassets/AppIcon.appiconset/icon-256.png" alt="" width="44" align="absmiddle"> GitIt
+# <img src="app/GitIt/Assets.xcassets/AppIcon.appiconset/icon-256.png" alt="" width="44" align="absmiddle"> GitIt
 
 Everything on GitHub that's waiting on you (your open PRs, review requests, assigned issues/PRs and unread notifications) in your menu bar, your notifications and your browser toolbar.
 
@@ -28,21 +28,21 @@ GitIt is a small macOS app that does the work: it checks GitHub in the backgroun
 
 ### Chrome
 
-Coming soon, installed from the Mac app when Chrome is on your machine. Same badge, popup and dashboard.
+The same badge, popup and dashboard, fed by the same Mac app. Install it from GitIt's settings: **Browser Extensions > Chrome > Install…**, then load it in Chrome as the app shows you. More in [`chrome/README.md`](chrome/README.md).
 
 ## Install
 
 Requires macOS 14+ and Xcode 16+.
 
 ```sh
-cp safari/Config/Local.example.xcconfig safari/Config/Local.xcconfig   # optional: add your Team ID
+cp app/Config/Local.example.xcconfig app/Config/Local.xcconfig   # optional: add your Team ID
 make install                                                            # builds, installs to ~/Applications, opens
 ```
 
-Without a Team ID the app is signed ad-hoc and Safari needs **Develop > Allow Unsigned Extensions**. More in [`safari/README.md`](safari/README.md).
+Without a Team ID the app is signed ad-hoc and Safari needs **Develop > Allow Unsigned Extensions**. More in [`app/README.md`](app/README.md).
 
 **Setup:**
 
 1. Create a [classic token](https://github.com/settings/tokens/new?scopes=notifications,repo,read:org&description=GitIt) with `notifications`, `repo`, `read:org`.
 2. Paste it into GitIt's settings and press Save.
-3. Under **Browser Extensions**, press **Enable…** next to Safari and turn GitIt on.
+3. Under **Browser Extensions**, press **Enable…** next to Safari and turn GitIt on, and **Install…** next to Chrome if you use it.

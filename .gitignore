@@ -3,4 +3,4 @@ build/
 DerivedData/
 xcuserdata/
 *.xcuserstate
-safari/Config/Local.xcconfig
+app/Config/Local.xcconfig

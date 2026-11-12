@@ -1,0 +1,30 @@
+{
+    "manifest_version": 3,
+    "name": "GitIt",
+    "description": "A badge with everything on GitHub that is waiting on you, and a dashboard listing it.",
+    "version": "1.0",
+    "author": "Ryan Gordon",
+    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApfFO2WkNpoA2QCMyTVXCqBbYN2Ar6rodJtVauV1XHaWOBptzlyFToiiDN0kpl90GkJsTBaeNSpVxqq7NdvqMbWf5SNgzv0blKcQXcQRr3CkKX6Z6QlIJdJb2iZ62EYqpNlLx6jm0m1GwhHaT+3herhFVEDBFDZLzXKKwW7TkdnZLE/7rrubFrdhzEBdtsITYyKMGzxl9oNuKQrFoD+lMdvNUZiTdajjEW9xMP+U9+83yo7HtHVhvGtOk836cdHf3Lin4QpD4OzxtfOd7OwCjOz4ZXpjRd5AZiHsh9GgAhF0Q8m8vOHDBUZ8l3JTKJ/qFjV0dPa8O0fy1SVgL1MA19QIDAQAB",
+
+    "icons": {
+        "16": "icons/icon-16.png",
+        "32": "icons/icon-32.png",
+        "48": "icons/icon-48.png",
+        "128": "icons/icon-128.png"
+    },
+
+    "background": {
+        "service_worker": "background.js"
+    },
+
+    "action": {
+        "default_icon": {
+            "16": "icons/toolbar-16.png",
+            "32": "icons/toolbar-32.png"
+        },
+        "default_title": "GitIt",
+        "default_popup": "popup.html"
+    },
+
+    "permissions": [ "nativeMessaging", "alarms", "storage", "tabs" ]
+}
