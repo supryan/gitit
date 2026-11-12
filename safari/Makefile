@@ -8,7 +8,8 @@
 PROJECT   := GitIt.xcodeproj
 SCHEME    := GitIt
 CONFIG    := Release
-BUILD_DIR := build
+# Spotlight skips folders named *.noindex, so the built copy never shows up as a second GitIt.
+BUILD_DIR := build/xcode.noindex
 APP       := $(BUILD_DIR)/Build/Products/$(CONFIG)/GitIt.app
 DEST      := $(HOME)/Applications/GitIt.app
 LSREGISTER := /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
@@ -38,4 +39,4 @@ icons:
 	swift scripts/make-icons.swift "$(CURDIR)"
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf build
