@@ -22,6 +22,9 @@ LSREGISTER := /System/Library/Frameworks/CoreServices.framework/Frameworks/Launc
 build:
 	set -o pipefail; xcodebuild -project $(PROJECT) -scheme $(SCHEME) -configuration $(CONFIG) \
 		-derivedDataPath $(BUILD_DIR) -allowProvisioningUpdates build 2>&1 | scripts/filter-xcodebuild.sh
+	@# Xcode registers what it builds with macOS; forget it at once, so a build alone never
+	@# adds a second GitIt to Safari or Spotlight.
+	@$(LSREGISTER) -u "$(APP)" 2>/dev/null || true
 
 install: build
 	mkdir -p "$(HOME)/Applications"
@@ -30,8 +33,8 @@ install: build
 	ditto "$(APP)" "$(DEST)"
 	@# ditto keeps the bundle's dates, so Finder and the Dock would keep the cached icon.
 	touch "$(DEST)"
-	@# Forget the copy in ./build so Safari lists only the installed extension.
-	$(LSREGISTER) -u "$(APP)" || true
+	@# Exactly one GitIt registered with macOS, and so in Safari: the installed copy.
+	scripts/keep-one-gitit.sh "$(DEST)"
 	@echo "Installed $(DEST)"
 	open "$(DEST)"
 
