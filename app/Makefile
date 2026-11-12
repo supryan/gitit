@@ -69,7 +69,10 @@ release:
 	scripts/fetch-notarized.sh "$(ARCHIVE)" "$(RELEASE_DIR)/notarized"
 	xcrun stapler validate "$(RELEASE_DIR)/notarized/GitIt.app"
 	ditto -c -k --keepParent "$(RELEASE_DIR)/notarized/GitIt.app" "$(RELEASE_ZIP)"
-	@$(LSREGISTER) -u "$(RELEASE_DIR)/notarized/GitIt.app" 2>/dev/null || true
+	@# Archiving, exporting and notarizing leave several registered copies of GitIt (signed by
+	@# the release team); forget them all, or Safari lists their extension and later calls it
+	@# "no longer valid" once the build folder changes.
+	scripts/keep-one-gitit.sh "$(DEST)"
 	@echo "Release: $(RELEASE_ZIP)"
 
 # Tags v$(VERSION) on GitHub and attaches the zip; the README's download button always
